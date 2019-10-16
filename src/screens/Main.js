@@ -1,6 +1,5 @@
 import React from 'react';
-import Game from "./Game";
-import Game2 from "./Game2"
+import Game from "./Game"
 import { Switch, Route, Redirect } from 'react-router-dom';
 
 
@@ -8,7 +7,7 @@ const Main = () => {
     return (
         <div>
             <Switch>
-                <Route path="/home" component={Game2} />
+                <Route path="/home" component={Game} />
                 <Redirect to="/home" />
             </Switch>
         </div>

@@ -1,150 +1,112 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import * as snake from '../logics/snake';
+import * as mouse from "../logics/mouse";
 import "../assets/game.scss";
 
+let context;
+let ts = 20;
+const WIDTH = 400;
+const HEIGHT = 400;
+let mouseX; let mouseY;
+
 const Game = () => {
-    const [score, setScore] = useState(0);
-    const canvasRef = useRef(null);
-    const WIDTH = 400;
-    const HEIGHT = 400;
-    let gridSize = 20; let tileSize = 20;
-    let speedX = 0; let speedY = 0;
-    let context;
-    let flag; let snake;
-    const snakeHeight = 20;
+	let [score, setScore] = useState(0);
+	const canvasRef = useRef(null);
+	let speed = 1000 / 10;
+	let dx = ts; let dy = 0;
 
-    useEffect(() => {
-        createCanvas();
-        startGame();
-        window.addEventListener("keydown", handleKeyEvent);
-    });
+	useEffect(() => {
+		startGame();
+		window.addEventListener("keydown", handleKeyEvent);
+		setInterval(updateArena, speed);
+	});
 
-    const startGame = () => {
-        let snakeX = 100; let snakeY = 100; let snakeWidth = 60;
-        let flagX; let flagY;
-        let minX = snakeHeight / 2; let maxX = WIDTH - snakeHeight / 2; let minY = 0; let maxY = HEIGHT - snakeHeight;
-        snake = new Snake("right", snakeX, snakeY, snakeWidth, snakeHeight);
-        do {
-            flagX = Math.floor(Math.random() * (maxX - minX + 1) + minX);
-            flagY = Math.floor(Math.random() * (maxY - minY + 1) + minY);
-        } while ( !(flagX <= snakeX - 10) && !(flagX >= snakeX + snakeWidth + snakeHeight / 2));
-        flag = new Flag("blue", flagX, flagY, snakeHeight);
-    };
+	const createCanvas  = () => {
+		const canvas = canvasRef.current;
+		context = canvas.getContext('2d');
+		context.fillStyle = "rgba(0, 0, 0, 0)";
+		context.fillRect(0, 0, WIDTH, HEIGHT);
+	};
 
-    function Snake(direction, x, y, width, height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.direction = direction;
-        const partWidth = this.width / 3;
-        let head = new Part("#1d6f0f", x, y, partWidth, this.height);
-        let body = new Part("#17306f", x + partWidth, y, partWidth, this.height);
-        let tail = new Part("#6f2a24", x + 2 * partWidth, y, partWidth, this.height);
-        this.parts = [head, body, tail];
-        this.update = () => {
-            this.parts.forEach(part => { part.update(); part.newPos(); });
-        };
-    }
+	const clearCanvas = () => {
+		context.clearRect(0, 0, WIDTH, HEIGHT);
+		context.strokeRect(0, 0, WIDTH, HEIGHT);
+	};
 
-    function Part (color, x, y, width, height) {
-        this.x = x;
-        this.y = y;
-        this.speedX = 0;
-        this.speedY = 0;
-        this.width = width;
-        this.height = height;
-        this.color = color;
-        this.update = () => {
-            context.fillStyle = color;
-            context.strokeStyle = "darkgreen";
-            context.fillRect(this.x, this.y, this.width, this.height);
-            context.strokeRect(this.x, this.y, this.width, this.height);
-        };
-        this.newPos = () => {
-            this.x += this.speedX;
-            this.y += this.speedY;
-        };
-    }
+	const startGame = () => {
+		createCanvas();
+		clearCanvas();
+		snake.drawSnake();
+		[mouseX, mouseY] = mouse.changePos();
+		mouse.drawMouse(mouseX, mouseY);
+	};
 
-    const createCanvas = () => {
-        const canvas = canvasRef.current;
-        context = canvas.getContext('2d');
-        context.fillStyle = "rgba(0, 0, 0, 0)";
-        context.fillRect(0, 0, WIDTH, HEIGHT);
-    };
+	const updateArena = () => {
+		clearCanvas();
+		snake.moveSnake(dx, dy);
+		snake.drawSnake();
+		mouse.drawMouse(mouseX, mouseY);
+		eatMouse(snake.snake);
+	};
 
-    const handleKeyEvent = (event) => {
-        switch (event.keyCode) {
-            case 38:
-                speedY = -1;
-                speedX = 0;
-                break;
-            case 40:
-                speedY = 1;
-                speedX = 0;
-                break;
-            case 37:
-                speedY = 0;
-                speedX = -1;
-                break;
-            case 39:
-                speedY = 0;
-                speedX = 1;
-                break;
-            default:
-                break;
-        }
-    };
+	const eatMouse = (snake) => {
+		if (snake[0].x === mouseX && snake[0].y === mouseY) {
+			snake.push({ x: mouseX, y: mouseY });
+			[mouseX, mouseY] = mouse.changePos();
+			setScore(prevScore => prevScore + 5);
+		}
+	};
 
+	const handleKeyEvent = (event) => {
+		switch (event.keyCode) {
+			case 38:
+				if (dy === 0) {
+					dy = -ts;
+					dx = 0;
+				}
+				break;
+			case 40:
+				if (dy === 0) {
+					dy = ts;
+					dx = 0;
+				}
+				break;
+			case 37:
+				if (dx === 0) {
+					dy = 0;
+					dx = -ts;
+				}
+				break;
+			case 39:
+				if (dx === 0) {
+					dy = 0;
+					dx = ts;
+				}
+				break;
+			default:
+				break;
+		}
+	};
 
-    function Flag (color, x, y, height) {
-        this.x = x;
-        this.y = y;
-        this.height = height;
-        context.beginPath();
-        context.moveTo(x, y);
-        context.lineTo(x - snakeHeight / 2, y + this.height / 2);
-        context.lineTo(x, y + this.height);
-        context.lineTo(x + snakeHeight / 2, y + this.height / 2);
-        context.lineTo(x, y);
-        this.update = () => {
-            context.strokeStyle = color;
-            context.stroke();
-        };
-        this.newPos = () => {
-            this.x = Math.floor(Math.random() * (WIDTH - 20));
-            this.y = Math.floor(Math.random() * (HEIGHT - 20));
-        };
-    }
-
-    const captureFlag = () => {
-        if (flag.y === snake[0].y) {
-            setScore(score => score + 5);
-            flag.newPos();
-            snake.push(new Part("#6f6e6d", WIDTH / 2, HEIGHT / 2, 20, 20));
-        }
-    };
-
-    const updateArea = () => {
-        context.clearRect(0, 0, WIDTH, HEIGHT);
-        snake.update();
-        flag.update();
-        // captureFlag();
-    };
-
-    return (
-        <div className="game">
-            <div className="board">
-                <p> Snake </p>
-                <canvas className="canvas" ref={canvasRef} width={WIDTH} height={HEIGHT}/>
-            </div>
-            <div className="labels">
-                <button onClick={startGame}> Start Game </button>
-                <p> score: {score} </p>
-            </div>
-        </div>
-    )
+	return (
+		<div className="game">
+			<div className="board">
+				<p> Snake </p>
+				<canvas className="canvas" ref={canvasRef} width={WIDTH} height={HEIGHT}/>
+			</div>
+			<div className="labels">
+				<button onClick={startGame}> Start Game </button>
+				<p> score: {score} </p>
+			</div>
+		</div>
+	)
 };
 
-
 export default Game;
+
+export {
+	context,
+	ts,
+	WIDTH,
+	HEIGHT,
+}
