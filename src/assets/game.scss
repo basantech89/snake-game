@@ -1,36 +1,3 @@
-@mixin text {
-  color: white;
-  font-family: "Courier New", sans-serif;
-  font-size: 3em;
-}
-
-.game {
-  background: #40aa39;
-  display: grid;
-  height: 100vh;
-}
-
-.board > p {
-  @include text;
-  text-align: center;
-}
-
-.game .board {
-  margin: 0 auto auto;
-}
-
 .canvas {
-  border: 10px solid #1d6f0f;
-  //margin: 0 auto;
-}
-
-.labels {
-  position: absolute;
-  top: 200px;
-  left: 50px;
-  @include text;
-
-  button {
-    font-size: x-large;
-  }
+  background: #67d963;
 }

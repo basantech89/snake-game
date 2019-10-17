@@ -1,60 +1,59 @@
-import React, { useEffect, useRef, useState } from 'react';
-import * as snake from '../logics/snake';
-import * as mouse from "../logics/mouse";
+import React, { useEffect, useRef } from 'react';
+import * as arena from "../logics/arena";
 import "../assets/game.scss";
 
 let context;
 let ts = 20;
-const WIDTH = 400;
-const HEIGHT = 400;
-let mouseX; let mouseY;
+const canvasWidth = window.innerWidth - 5; const canvasHeight = window.innerHeight - 5;
+let updateScore;
+let resetGame;
 
 const Game = () => {
-	let [score, setScore] = useState(0);
 	const canvasRef = useRef(null);
+	let score = 0;
 	let speed = 1000 / 10;
 	let dx = ts; let dy = 0;
 
 	useEffect(() => {
+		createCanvas();
+		arena.createArena();
 		startGame();
 		window.addEventListener("keydown", handleKeyEvent);
-		setInterval(updateArena, speed);
+		setInterval(updateCanvas, 1000 / 500);
+		setInterval(() => arena.drawArena(dx, dy), speed);
 	});
 
 	const createCanvas  = () => {
 		const canvas = canvasRef.current;
 		context = canvas.getContext('2d');
-		context.fillStyle = "rgba(0, 0, 0, 0)";
-		context.fillRect(0, 0, WIDTH, HEIGHT);
+	};
+
+	updateScore = () => score += 5;
+
+	const showScore = () => {
+		context.fillStyle = "#449041";
+		context.font = "bold 30px Arial";
+		context.fillText(`Score ${score}`, 50, 150);
 	};
 
 	const clearCanvas = () => {
-		context.clearRect(0, 0, WIDTH, HEIGHT);
-		context.strokeRect(0, 0, WIDTH, HEIGHT);
+		context.clearRect(0, 0, canvasWidth, canvasHeight);
+		context.strokeRect(0, 0, canvasWidth, canvasHeight);
 	};
 
 	const startGame = () => {
-		createCanvas();
+		arena.changeMousePos();
 		clearCanvas();
-		snake.drawSnake();
-		[mouseX, mouseY] = mouse.changePos();
-		mouse.drawMouse(mouseX, mouseY);
 	};
 
-	const updateArena = () => {
-		clearCanvas();
-		snake.moveSnake(dx, dy);
-		snake.drawSnake();
-		mouse.drawMouse(mouseX, mouseY);
-		eatMouse(snake.snake);
+	resetGame = () => {
+		score = 0;
 	};
 
-	const eatMouse = (snake) => {
-		if (snake[0].x === mouseX && snake[0].y === mouseY) {
-			snake.push({ x: mouseX, y: mouseY });
-			[mouseX, mouseY] = mouse.changePos();
-			setScore(prevScore => prevScore + 5);
-		}
+	const updateCanvas = () => {
+		clearCanvas();
+		arena.createArena();
+		showScore();
 	};
 
 	const handleKeyEvent = (event) => {
@@ -89,16 +88,7 @@ const Game = () => {
 	};
 
 	return (
-		<div className="game">
-			<div className="board">
-				<p> Snake </p>
-				<canvas className="canvas" ref={canvasRef} width={WIDTH} height={HEIGHT}/>
-			</div>
-			<div className="labels">
-				<button onClick={startGame}> Start Game </button>
-				<p> score: {score} </p>
-			</div>
-		</div>
+			<canvas className="canvas" ref={canvasRef} width={canvasWidth} height={canvasHeight}/>
 	)
 };
 
@@ -107,6 +97,8 @@ export default Game;
 export {
 	context,
 	ts,
-	WIDTH,
-	HEIGHT,
+	updateScore,
+	resetGame,
+	canvasWidth,
+	canvasHeight
 }
