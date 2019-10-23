@@ -1,3 +1,76 @@
+@import url('https://fonts.googleapis.com/css?family=Cairo|Exo+2|Maven+Pro|Press+Start+2P|Teko&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Comfortaa:400|Kanit:400|Montserrat:700|Quicksand:600|Nunito:600&display=swap');
+
+$arenaX: 400px;
+$arenaY: 100px;
+$light: #0da958;
+$dark: #076232;
+
 .canvas {
-  background: #67d963;
+  background: $light;
+}
+
+.arena {
+  position: absolute;
+  top: $arenaY;
+  left: $arenaX;
+  border: 4px solid $dark;
+}
+
+@mixin font {
+  position: absolute;
+  font-family: 'Press Start 2P', sans-serif;
+  color: $dark;
+}
+
+@mixin button {
+  @include font;
+  top: $arenaY + 250;
+  border: none;
+  background: $light;
+  font-size: x-large;
+  padding: 10px 20px;
+  &:hover {
+    background: $dark;
+    color: $light;
+    border-radius: 15px;
+  }
+}
+
+.welcome {
+  p:nth-child(1) {
+    @include font;
+    font-family: 'Exo 2', sans-serif;
+    font-weight: bolder;
+    font-size: 55px;
+    top: $arenaY;
+    left: $arenaX + 220;
+  }
+  p:nth-child(2) {
+    @include font;
+    font-size: 25px;
+    top: $arenaY + 150;
+    left: $arenaX + 150;
+  }
+  button:nth-child(3) {
+    @include button;
+    left: $arenaX + 40;
+  }
+  button:nth-child(4) {
+    @include button;
+    left: $arenaX + 200;
+  }
+  button:nth-child(5) {
+    @include button;
+    left: $arenaX + 360;
+  }
+}
+
+.game-over {
+  button {
+    @include button;
+    top: $arenaY + 150;
+    left: $arenaX + 80;
+    font-size: 3rem;
+  }
 }

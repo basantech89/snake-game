@@ -1,26 +1,21 @@
 import React, { useEffect, useRef } from 'react';
-import * as arena from "../logics/arena";
+import Arena from "./Arena";
 import "../assets/game.scss";
 
-let context;
-let ts = 20;
-const canvasWidth = window.innerWidth - 5; const canvasHeight = window.innerHeight - 5;
-let updateScore;
-let resetGame;
+let tileSize = 20;
+let tilesX = 30;
+let tilesY = 20;
+let updateScore; let updateCanvas; let clearCanvas; let setSnakeMovement; let handleKeyEvent;
+let dx = 0; let dy = 0; let score = 0;
+let takingTurn; let setTurn;
 
 const Game = () => {
 	const canvasRef = useRef(null);
-	let score = 0;
-	let speed = 1000 / 10;
-	let dx = ts; let dy = 0;
+	const canvasWidth = window.innerWidth - 5; const canvasHeight = window.innerHeight - 5;
+	let context;
 
 	useEffect(() => {
 		createCanvas();
-		arena.createArena();
-		startGame();
-		window.addEventListener("keydown", handleKeyEvent);
-		setInterval(updateCanvas, 1000 / 500);
-		setInterval(() => arena.drawArena(dx, dy), speed);
 	});
 
 	const createCanvas  = () => {
@@ -28,59 +23,50 @@ const Game = () => {
 		context = canvas.getContext('2d');
 	};
 
-	updateScore = () => score += 5;
-
-	const showScore = () => {
-		context.fillStyle = "#449041";
-		context.font = "bold 30px Arial";
-		context.fillText(`Score ${score}`, 50, 150);
-	};
-
-	const clearCanvas = () => {
+	clearCanvas = () => {
 		context.clearRect(0, 0, canvasWidth, canvasHeight);
 		context.strokeRect(0, 0, canvasWidth, canvasHeight);
 	};
 
-	const startGame = () => {
-		arena.changeMousePos();
-		clearCanvas();
+	updateScore = (newScore) => score = newScore;
+
+	setSnakeMovement = (x, y) => {
+		dx = x;
+		dy = y;
 	};
 
-	resetGame = () => {
-		score = 0;
+	setTurn = (bool) => takingTurn = bool;
+
+	const showScore = () => {
+		context.fillStyle = "#076232";
+		context.font = "20px 'Press Start 2P'";
+		context.fillText(`Score ${score}`, 400, 600);
 	};
 
-	const updateCanvas = () => {
+	updateCanvas = () => {
 		clearCanvas();
-		arena.createArena();
 		showScore();
 	};
 
-	const handleKeyEvent = (event) => {
+	handleKeyEvent = (event) => {
+		if (takingTurn) return;
+		setTurn(true);
 		switch (event.keyCode) {
 			case 38:
-				if (dy === 0) {
-					dy = -ts;
-					dx = 0;
-				}
+				if (dy === 0)
+					setSnakeMovement(0, -tileSize);
 				break;
 			case 40:
-				if (dy === 0) {
-					dy = ts;
-					dx = 0;
-				}
+				if (dy === 0)
+					setSnakeMovement(0, tileSize);
 				break;
 			case 37:
-				if (dx === 0) {
-					dy = 0;
-					dx = -ts;
-				}
+				if (dx === 0)
+					setSnakeMovement(-tileSize, 0);
 				break;
 			case 39:
-				if (dx === 0) {
-					dy = 0;
-					dx = ts;
-				}
+				if (dx === 0)
+					setSnakeMovement(tileSize, 0);
 				break;
 			default:
 				break;
@@ -88,17 +74,22 @@ const Game = () => {
 	};
 
 	return (
+		<div>
 			<canvas className="canvas" ref={canvasRef} width={canvasWidth} height={canvasHeight}/>
+			<Arena/>
+		</div>
 	)
 };
 
 export default Game;
 
 export {
-	context,
-	ts,
+	tileSize, tilesX, tilesY,
 	updateScore,
-	resetGame,
-	canvasWidth,
-	canvasHeight
+	updateCanvas,
+	setSnakeMovement,
+	handleKeyEvent,
+	clearCanvas,
+	dx, dy, score,
+	takingTurn, setTurn
 }

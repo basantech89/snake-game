@@ -6,13 +6,13 @@ let mouseX; let mouseY;
 
 const changePos = () => {
 	// get 2 random nums confined in the canvas width nad height
-	const maxX = game.ts - 1; const minX = 0;
-	const maxY = game.ts - 1; const minY = 0;
+	const maxX = game.tilesX - 1; const minX = 0;
+	const maxY = game.tilesY - 1; const minY = 0;
 
  	// keep finding the numbers until they collide with the snake position
 	do {
-		mouseX = Math.floor(Math.random() * (maxX - minX + 1) + minX) * game.ts + 400;
-		mouseY = Math.floor(Math.random() * (maxY - minY + 1) + minY) * game.ts + 100;
+		mouseX = Math.floor(Math.random() * (maxX - minX + 1) + minX) * game.tileSize;
+		mouseY = Math.floor(Math.random() * (maxY - minY + 1) + minY) * game.tileSize;
 	} while (ifCollideWithSnake(mouseX, mouseY));
 
 	return [mouseX, mouseY];
@@ -22,7 +22,7 @@ const changePos = () => {
 // return false if x or y collides with the snake position, true otherwise
 const ifCollideWithSnake = (x, y) => {
 	let len = snake.length;
-	if (snake[0].x + game.ts <= x || snake[0].y + game.ts <= y ||
+	if (snake[0].x + game.tileSize <= x || snake[0].y + game.tileSize <= y ||
 		snake[len - 1].x >= x || snake[len - 1].y >= y)
 		return false;
 	else return true;

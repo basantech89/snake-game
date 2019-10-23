@@ -1,15 +1,17 @@
+/*
 import * as game from "../screens/Game";
 import * as snake from '../logics/snake';
 import * as mouse from "../logics/mouse";
 
-const arenaX = 400; const arenaY = 100;
-const arenaWidth = 400; const arenaHeight = 400;
+const arenaX = 0; const arenaY = 0;
+const arenaWidth = 600; const arenaHeight = 400;
 
 const createArena = () => {
-	game.context.fillStyle = "#449041";
-	game.context.fillRect(arenaX, arenaY, arenaWidth, arenaHeight);
-	snake.drawSnake();
-	mouse.drawMouse(mouse.mouseX, mouse.mouseY);
+	game.context.strokeStyle = "#076232";
+	game.context.lineWidth = 4;
+	game.context.strokeRect(arenaX, arenaY, arenaWidth, arenaHeight);
+	// snake.drawSnake();
+	// mouse.drawMouse(mouse.mouseX, mouse.mouseY);
 };
 
 const changeMousePos = () => mouse.changePos();
@@ -22,4 +24,4 @@ const drawArena = (dx, dy) => {
 
 export {
 	createArena, drawArena, changeMousePos
-}
+}*/
